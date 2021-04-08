@@ -19,6 +19,7 @@ def _list():
 
     page = request.args.get('page', type=int, default=1)
     kw = request.args.get('kw',type=str, default='')
+    question_list = Question.query.order_by(Question.create_date.desc())
     #so = request.args.get('so', type=str, default='recent')
     """
     # 정렬
