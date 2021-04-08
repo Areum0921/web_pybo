@@ -1,13 +1,12 @@
 from datetime import datetime
 
-from sqlalchemy import func
-
 from flask import Blueprint, render_template, request, url_for, g, flash
+from sqlalchemy import func
 from werkzeug.utils import redirect
 from .. import db
 from .. models import Question, Answer, User, question_voter
-
 from ..forms import QuestionForm,AnswerForm
+
 from pybo.views.auth_views import login_required
 bp = Blueprint('question',__name__, url_prefix='/question')
 # url_prefix 는 함수의 애너테이션 URL 앞에 기본값으로 붙일 접두어다.
@@ -57,24 +56,8 @@ def _list():
                     sub_query.c.username.ilike(search)
                     ) \
             .distinct()
-        """
-        sub_query = db.session.query(Answer.question_id, Answer.content, User.username) \
-            .join(User, Answer.user_id == User.id).subquery()
-        question_list = question_list \
-            .outerjoin(Answer) \
-            .outerjoin(User) \
-            .outerjoin(sub_query, sub_query.c.question_id == Question.id) \
-            .filter(Question.subject.ilike(search) |  # 질문제목
-                    Question.content.ilike(search) |  # 질문내용
-                    User.username.ilike(search) |  # 질문작성자
-                    Answer.ip.ilike(search) |  # 비로그인상태의 답변 작성자
-                    Question.ip.ilike(search) |  # 비로그인상태의 질문 작성자
-                    sub_query.c.content.ilike(search) |  # 답변내용
-                    sub_query.c.username.ilike(search)  # 답변작성자
-                    ) \
-            .distinct()
-        """
-    question_list = question_list.paginate(page, per_page=20)
+
+    question_list = question_list.paginate(page, per_page=10)
     # 최근 작성일자부터 출력
     return render_template('question/question_list.html',question_list=question_list,page=page, kw=kw, so=so)
 
