@@ -19,8 +19,8 @@ def _list():
 
     page = request.args.get('page', type=int, default=1)
     kw = request.args.get('kw',type=str, default='')
-    so = request.args.get('so', type=str, default='recent')
-"""
+    #so = request.args.get('so', type=str, default='recent')
+    """
     # 정렬
     if so == 'recommend':
         sub_query = db.session.query(question_voter.c.question_id, func.count('*').label('num_voter')) \
@@ -39,7 +39,7 @@ def _list():
 
     else:
         question_list = Question.query.order_by(Question.create_date.desc())
-"""
+    """
     if kw:
         search = '%%{}%%'.format(kw)
         sub_query = db.session.query(Answer.question_id, User.username) \
@@ -76,8 +76,8 @@ def _list():
         """
     question_list = question_list.paginate(page, per_page=20)
     # 최근 작성일자부터 출력
-    return render_template('question/question_list.html',question_list=question_list,page=page, kw=kw, so=so)
-
+    return render_template('question/question_list.html',question_list=question_list)
+#,page=page, kw=kw, so=so
 @bp.route('/detail/<int:question_id>/')
 def detail(question_id):
     form = AnswerForm()
