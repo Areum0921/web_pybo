@@ -56,6 +56,15 @@
                     </div>
                     {% endif %}
                     {% endif %}
+                    {% if not question.user %}
+                    <a href="{{ url_for('question.modify', question_id=question.id) }}"
+                            class="btn btn-sm btn-outline-secondary">수정</a>
+                        <a href="#" class="delete btn btn-sm btn-outline-secondary"
+                            data-uri="{{ url_for('question.delete', question_id=question.id) }}">삭제</a>
+                    {% endif %}
+
+
+
                     <!-- 질문 댓글 -->
                     {% if question.comment_set|length > 0 %}
                     <div class="mt-3">
