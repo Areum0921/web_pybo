@@ -7,7 +7,7 @@ from werkzeug.utils import redirect
 from .. import db
 from .. models import Question, Answer, User, question_voter
 
-from ..forms import QuestionForm,AnswerForm
+from ..forms import QuestionForm,AnswerForm,QuestionForm2,CheckPassword
 from pybo.views.auth_views import login_required
 bp = Blueprint('question',__name__, url_prefix='/question')
 # url_prefix 는 함수의 애너테이션 URL 앞에 기본값으로 붙일 접두어다.
@@ -22,6 +22,7 @@ def _list():
     so = request.args.get('so', type=str, default='recent')
 
     # 정렬
+
     if so == 'recommend':
         sub_query = db.session.query(question_voter.c.question_id, func.count('*').label('num_voter')) \
             .group_by(question_voter.c.question_id).subquery()
@@ -86,20 +87,24 @@ def detail(question_id):
 
 @bp.route('/create/',methods=('GET','POST'))
 def create():
-    form = QuestionForm()
+    if g.user: # 로그인 상태에따라 적용하는 form 나누기
+        form = QuestionForm()
+    else:
+        form = QuestionForm2()
     if request.method == 'POST' and form.validate_on_submit():
         get_ip = request.environ.get('HTTP_X_REAL_IP', request.remote_addr)
         if g.user:
             question = Question(subject=form.subject.data, content=form.content.data, create_date=datetime.now(),
-                            user=g.user)
+                          user=g.user)
         elif not g.user:
             question = Question(subject=form.subject.data, content=form.content.data, create_date=datetime.now(),
-                                ip=get_ip)
+                                ip=get_ip, password=form.password.data)
 
         db.session.add(question)
         db.session.commit()
         return redirect(url_for('main.index'))
     return render_template('question/question_form.html', form=form)
+
 
 @bp.route('/modify/<int:question_id>', methods=('GET','POST'))
 @login_required
@@ -120,17 +125,37 @@ def modify(question_id):
     return render_template('question/question_form.html',form=form)
 
 
-@bp.route('/delete/<int:question_id>')
-@login_required
+@bp.route('/delete/<int:question_id>',methods=('GET','POST'))
+#@login_required
 def delete(question_id):
     question = Question.query.get_or_404(question_id)
-    if g.user:
+    if g.user and question.user:
         if g.user != question.user:
             flash('삭제권한이 없습니다.')
             return redirect(url_for('question.detail', question_id=question_id))
+
+    if not question.user: # 해당 질문글이 비회원 상태에서 써졌을경우
+        form = CheckPassword()
+        if(request.method == 'POST' and form.validate_on_submit()):
+            password = form.password_check.data # form으로 비밀번호 입력 받기
+
+            if(password != question.password):
+                flash('해당 질문글의 비밀번호와 다릅니다.')
+                return render_template('question/no_login_password.html', form=form)
+                #return redirect(url_for('question.detail', question_id=question_id))
+            else:
+                db.session.delete(question)
+                db.session.commit()
+                return redirect(url_for('question._list'))
+
+        return render_template('question/no_login_password.html', form=form)
+
     db.session.delete(question)
     db.session.commit()
     return redirect(url_for('question._list'))
+
+
+
 
 
 

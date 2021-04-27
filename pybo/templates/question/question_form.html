@@ -23,6 +23,13 @@
             <label for="content">내용</label>
             <textarea class="form-control" name="content" id="content" rows="10">{{ form.content.data or '' }}</textarea>
         </div>
+        <!-- 비로그인 상태일때만 비밀번호 입력 -->
+        {% if not g.user %}
+        <div class="form-group">
+            <label for="password">비밀번호</label><br>
+            <textarea type="text" name="password" id="password" rows="1">{{ form.password.data or ''}}</textarea>
+        </div>
+        {% endif %}
 
         <button type="submit" class="btn btn-outline-primary">저장하기</button>
     </form>
