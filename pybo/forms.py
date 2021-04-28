@@ -4,13 +4,13 @@ from wtforms.fields.html5 import EmailField
 from wtforms.validators import DataRequired, Length, EqualTo, Email
 
 class QuestionForm(FlaskForm):
-    subject = StringField('제목', validators=[DataRequired('반드시 제목을 입력해주세요')])
+    subject = StringField('제목', validators=[DataRequired('반드시 제목을 입력해주세요'), Length(min=1, max=20)])
     content = TextAreaField('내용', validators=[DataRequired('반드시 내용을 입력해주세요')])
 
 class QuestionForm2(FlaskForm):
-    subject = StringField('제목', validators=[DataRequired('반드시 제목을 입력해주세요')])
+    subject = StringField('제목', validators=[DataRequired('반드시 제목을 입력해주세요'), Length(min=1, max=20)])
     content = TextAreaField('내용', validators=[DataRequired('반드시 내용을 입력해주세요')])
-    password = PasswordField('비밀번호', validators=[DataRequired('글을 수정, 삭제할때 필요합니다.')])
+    password = PasswordField('비밀번호', validators=[DataRequired('비회원 작성 글을 삭제 및 수정할때 필요합니다.(4글자~20글자)'), Length(min=4,max=20)])
 
 class CheckPassword(FlaskForm):
     password_check = PasswordField('비밀번호 확인',validators=[DataRequired('삭제 및 수정을 위해 질문글의 비밀번호가 필요합니다.')])

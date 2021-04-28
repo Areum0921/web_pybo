@@ -1,11 +1,8 @@
-from flask import Flask
+from flask import Flask, render_template
 from flask_migrate import Migrate
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import MetaData
 from flaskext.markdown import Markdown
-
-import config
-
 
 naming_convention = {
     "ix": 'ix_%(column_0_label)s',
@@ -17,11 +14,14 @@ naming_convention = {
 db = SQLAlchemy(metadata=MetaData(naming_convention=naming_convention))
 migrate = Migrate()
 
+def page_not_found(e): # 404 오류일때 띄울 화면
+    return render_template('404.html'), 404
 
 def create_app():
     app = Flask(__name__)  # 플라스크 애플리케이션을 생성하는 코드
 
-    app.config.from_object(config) # config.py에 작성한 항목 app.config를 환경 변수로 부르기위함
+    app.config.from_envvar('APP_CONFIG_FILE')
+    # 환경 변수 APP_CONFIG_FILE에 정의된 파일을 환경 파일로 사용
 
     # ORM
     db.init_app(app) # 초기화
@@ -47,6 +47,8 @@ def create_app():
 
 #마크다운
     Markdown(app, extensions=['nl2br','fenced_code'])
+    #오류페이지
+    app.register_error_handler(404, page_not_found)
     return app
 
 
