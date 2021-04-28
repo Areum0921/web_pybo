@@ -13,6 +13,8 @@ def hello_pybo():
 
 @bp.route('/')
 def index():
+    10/0
+    10/0
     question_list = Question.query.order_by(Question.create_date.desc())
     # 최근 작성일자부터 출력
     return redirect(url_for('question._list'))
