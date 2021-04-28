@@ -1,4 +1,4 @@
-from flask import Flask
+from flask import Flask, render_template
 from flask_migrate import Migrate
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import MetaData
@@ -14,6 +14,8 @@ naming_convention = {
 db = SQLAlchemy(metadata=MetaData(naming_convention=naming_convention))
 migrate = Migrate()
 
+def page_not_found(e): # 404 오류일때 띄울 화면
+    return render_template('404.html'), 404
 
 def create_app():
     app = Flask(__name__)  # 플라스크 애플리케이션을 생성하는 코드
@@ -45,6 +47,8 @@ def create_app():
 
 #마크다운
     Markdown(app, extensions=['nl2br','fenced_code'])
+    #오류페이지
+    app.register_error_handler(404, page_not_found)
     return app
 
 
