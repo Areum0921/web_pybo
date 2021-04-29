@@ -17,6 +17,12 @@
             <li class="nav-item">
                 <a class="nav-link" href="{{ url_for('auth.logout')}}">{{ g.user.username }} 로그아웃</a>
             </li>
+            <li class="nav-item">
+                <a class="nav-link" href="{{ url_for('question.myquestion')}}">내가 작성한 글</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="#">내가 작성한 답변</a>
+            </li>
         </ul>
         {% else %}
         <ul class="navbar-nav">

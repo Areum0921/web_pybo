@@ -75,9 +75,60 @@ def _list():
                     ) \
             .distinct()
         """
-    question_list = question_list.paginate(page, per_page=20)
+    question_list = question_list.paginate(page, per_page=10)
     # 최근 작성일자부터 출력
     return render_template('question/question_list.html',question_list=question_list,page=page, kw=kw, so=so)
+
+@bp.route('/myquestion/')
+@login_required
+def myquestion():
+    page = request.args.get('page', type=int, default=1)
+    kw = request.args.get('kw', type=str, default='')
+    so = request.args.get('so', type=str, default='recent')
+
+    # 정렬
+
+    if so == 'recommend':
+        sub_query = db.session.query(question_voter.c.question_id, func.count('*').label('num_voter')) \
+            .group_by(question_voter.c.question_id).subquery()
+        question_list = Question.query \
+            .outerjoin(sub_query, Question.id == sub_query.c.question_id) \
+            .order_by(sub_query.c.num_voter.desc(), Question.create_date.desc())
+    elif so == 'popular':
+        sub_query = db.session.query(Answer.question_id, func.count('*').label('num_answer')) \
+            .group_by(Answer.question_id).subquery()
+        question_list = Question.query \
+            .outerjoin(sub_query, Question.id == sub_query.c.question_id) \
+            .order_by(sub_query.c.num_answer.desc(), Question.create_date.desc())
+    elif so == 'old':
+        question_list = Question.query.order_by(Question.create_date)
+
+    else:
+        question_list = Question.query.order_by(Question.create_date.desc())
+    #question_list = Question.query.order_by(Question.create_date.desc())
+    question_list = question_list \
+            .filter(Question.user == g.user) \
+            .distinct()
+    if kw:
+        search = '%%{}%%'.format(kw)
+        sub_query = db.session.query(Answer.question_id, User.username) \
+            .outerjoin(User, Answer.user_id == User.id).subquery()  # 답변자에 대한 user정보 저장 쿼리
+        question_list = question_list \
+            .outerjoin(Answer) \
+            .outerjoin(sub_query) \
+            .outerjoin(User, User.id == Question.user_id) \
+            .filter(Question.subject.ilike(search) |  # 질문 제목
+                    Question.content.ilike(search) |  # 질문 내용
+                    User.username.ilike(search) |  # 질문 or 답변 작성자
+                    Answer.ip.ilike(search) |  # 비로그인상태의 답변 작성자
+                    Question.ip.ilike(search) |  # 비로그인상태의 질문 작성자
+                    Answer.content.ilike(search) |  # 답변 내용
+                    sub_query.c.username.ilike(search)
+                    ) \
+            .distinct()
+
+    question_list = question_list.paginate(page, per_page=10)
+    return render_template('question/myquestion_list.html', question_list=question_list,page=page,kw=kw)
 
 @bp.route('/detail/<int:question_id>/')
 def detail(question_id):
