@@ -129,7 +129,7 @@
          </div>
     </div>
 
-<form id="searchForm" method="get" action="{{ url_for('question._list') }}">
+<form id="searchForm" method="get" action="{{ url_for('question.myquestion') }}">
     <input type="hidden" id="kw" name="kw" value="{{ kw or '' }}">
     <input type="hidden" id="page" name="page" value="{{ page }}">
     <input type="hidden" id="so" name="so" value="{{ so }}">
