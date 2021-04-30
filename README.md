@@ -1,6 +1,6 @@
 책 <점프 투 플라스크>를 참고하며 진행한 게시판 만들기 개인 프로젝트 입니다.
 
-사용 기술 : Python3, Flask, CSS, javascript, jquery, html
+사용 기술 : Python3, Flask, CSS, javascript, html
 
 프로젝트 기간 : 2021.03.05 ~
 
