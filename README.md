@@ -33,7 +33,7 @@
 
 계속해서 기능을 업데이트할 예정입니다.
 
-https://velog.io/@areum0921/series/Python-Flask
+https://velog.io/@areum0921/series/Python-Flask <br>
 https://velog.io/@areum0921/series/Python-Flask-%EB%82%B4%EB%A7%98%EB%8C%80%EB%A1%9C
 
 이곳에서 프로젝트 진행과정을 보실 수 있습니다.
