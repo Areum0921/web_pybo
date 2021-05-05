@@ -11,9 +11,9 @@
             <nav id="sidebar" class="border-top border-secondary">
                 <div class="list-group">
                     <a class="rounded-0 list-group-item list-group-item-action list-group-item-light active"
-                       href="http://localhost:5000/question/list/qna">질문 게시판</a>
+                       href="http://localhost:5000/question/list/">자유 게시판</a>
                     <a class="rounded-0 list-group-item list-group-item-action list-group-item-light active"
-                       href="http://localhost:5000/question/list/free">자유 게시판</a>
+                       href="http://localhost:5000/question/list/">질문 답변 게시판</a>
                 </div>
             </nav>
         </div>
@@ -39,7 +39,7 @@
     </div>
         <table class="table">
         <thead>
-        <tr class="table-primary">
+        <tr class="thead-dark">
             <th>번호</th>
             <th>추천수</th>
             <th>제목</th>
@@ -124,12 +124,12 @@
         </li>
         {% endif %}
     </ul>
-    <a href="{{url_for('question.create',category_name=category.name)}}" class="btn btn-outline-primary">질문 등록하기</a>
+    <a href="{{url_for('question.create')}}" class="btn btn-outline-primary">질문 등록하기</a>
 </div>
          </div>
     </div>
 
-<form id="searchForm" method="get" action="{{ url_for('question._list',category_name=category.name) }}">
+<form id="searchForm" method="get" action="{{ url_for('question._list') }}">
     <input type="hidden" id="kw" name="kw" value="{{ kw or '' }}">
     <input type="hidden" id="page" name="page" value="{{ page }}">
     <input type="hidden" id="so" name="so" value="{{ so }}">
