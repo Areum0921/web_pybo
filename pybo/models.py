@@ -1,7 +1,6 @@
 from pybo import db
 from sqlalchemy_utils import IPAddressType
 
-
 question_voter=db.Table(
     'question_voter',
     db.Column('user_id', db.Integer, db.ForeignKey('user.id', ondelete='CASCADE'), primary_key=True),
@@ -12,10 +11,10 @@ answer_voter = db.Table(
     db.Column('user_id', db.Integer, db.ForeignKey('user.id', ondelete='CASCADE'), primary_key=True),
     db.Column('answer_id', db.Integer, db.ForeignKey('answer.id', ondelete='CASCADE'), primary_key=True)
 )
-
+class Category(db.Model):
+    name = db.Column(db.String(20),primary_key=True,unique=True)
 
 class Question(db.Model):
-
     id = db.Column(db.Integer, primary_key=True)
     subject = db.Column(db.String(200), nullable=False)
     content = db.Column(db.Text(), nullable=False)
@@ -26,6 +25,8 @@ class Question(db.Model):
     modify_date=db.Column(db.DateTime(), nullable=True)
     voter = db.relationship('User', secondary=question_voter, backref=db.backref('question_voter_set'))
     password=db.Column(db.String(20), nullable=True)
+    category=db.relationship('Category')
+    category_name=db.Column(db.String(20),db.ForeignKey('category.name', ondelete='CASCADE'), nullable=True)
 
 
 
@@ -40,6 +41,7 @@ class Answer(db.Model):
     user = db.relationship('User', backref=db.backref('answer_set'))
     modify_date = db.Column(db.DateTime(), nullable=True)
     voter = db.relationship('User', secondary=answer_voter, backref=db.backref('answer_voter_set'))
+
 
 class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)

@@ -1,5 +1,5 @@
 from flask import Blueprint, url_for, current_app
-from pybo.models import Question
+from pybo.models import Question,Category
 from werkzeug.utils import redirect
 
 
@@ -16,7 +16,9 @@ def index():
     current_app.logger.info("INFO 레벨로 출력")
     question_list = Question.query.order_by(Question.create_date.desc())
     # 최근 작성일자부터 출력
-    return redirect(url_for('question._list'))
+    return redirect(url_for('question._list',category_name='qna')) 
+    # 메인 페이지 qna로 이동
+
 
 from flask import request
 @bp.route("/ip") # 접속자 ip 받기

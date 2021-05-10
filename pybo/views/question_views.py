@@ -5,7 +5,7 @@ from sqlalchemy import func
 from flask import Blueprint, render_template, request, url_for, g, flash
 from werkzeug.utils import redirect
 from .. import db
-from .. models import Question, Answer, User, question_voter
+from .. models import Question, Answer, User, question_voter, Category
 
 from ..forms import QuestionForm,AnswerForm,QuestionForm2,CheckPassword
 from pybo.views.auth_views import login_required
@@ -14,13 +14,12 @@ bp = Blueprint('question',__name__, url_prefix='/question')
 # url_prefix='/home' 으로 입력했으면,
 # 아래 hello_pybo 함수를 호출하는 URL 은 localhost:5000/home/이 된다.
 
-@bp.route('/list/')
-def _list():
-
+@bp.route('/list/<string:category_name>/')
+def _list(category_name):
+    category=Category.query.get_or_404(category_name)
     page = request.args.get('page', type=int, default=1)
     kw = request.args.get('kw',type=str, default='')
     so = request.args.get('so', type=str, default='recent')
-
     # 정렬
 
     if so == 'recommend':
@@ -41,6 +40,9 @@ def _list():
     else:
         question_list = Question.query.order_by(Question.create_date.desc())
 
+    question_list = question_list \
+            .filter(category.name == Question.category_name) \
+            .distinct()
     if kw:
         search = '%%{}%%'.format(kw)
         sub_query = db.session.query(Answer.question_id, User.username) \
@@ -77,7 +79,8 @@ def _list():
         """
     question_list = question_list.paginate(page, per_page=10)
     # 최근 작성일자부터 출력
-    return render_template('question/question_list.html',question_list=question_list,page=page, kw=kw, so=so)
+    return render_template('question/question_list.html',question_list=question_list,page=page, kw=kw, so=so,
+                           category=category)
 
 @bp.route('/myquestion/')
 @login_required
@@ -87,7 +90,6 @@ def myquestion():
     so = request.args.get('so', type=str, default='recent')
 
     # 정렬
-
     if so == 'recommend':
         sub_query = db.session.query(question_voter.c.question_id, func.count('*').label('num_voter')) \
             .group_by(question_voter.c.question_id).subquery()
@@ -128,7 +130,7 @@ def myquestion():
             .distinct()
 
     question_list = question_list.paginate(page, per_page=10)
-    return render_template('question/myquestion_list.html', question_list=question_list,page=page,kw=kw)
+    return render_template('question/myquestion_list.html', question_list=question_list,page=page,kw=kw,so=so)
 
 @bp.route('/detail/<int:question_id>/')
 def detail(question_id):
@@ -136,8 +138,10 @@ def detail(question_id):
     question = Question.query.get_or_404(question_id) #현재 질문의 id를 받아온다.
     return render_template('question/question_detail.html', question=question, form=form)
 
-@bp.route('/create/',methods=('GET','POST'))
-def create():
+@bp.route('/create/<string:category_name>/',methods=('GET','POST'))
+def create(category_name):
+    category = Category.query.get_or_404(category_name)
+
     if g.user: # 로그인 상태에따라 적용하는 form 나누기
         form = QuestionForm()
     else:
@@ -146,15 +150,15 @@ def create():
         get_ip = request.environ.get('HTTP_X_REAL_IP', request.remote_addr)
         if g.user:
             question = Question(subject=form.subject.data, content=form.content.data, create_date=datetime.now(),
-                          user=g.user)
+                          user=g.user, category_name=category.name)
         elif not g.user:
             question = Question(subject=form.subject.data, content=form.content.data, create_date=datetime.now(),
-                                ip=get_ip, password=form.password.data)
+                                ip=get_ip, password=form.password.data, category_name=category.name)
 
         db.session.add(question)
         db.session.commit()
-        return redirect(url_for('main.index'))
-    return render_template('question/question_form.html', form=form)
+        return redirect(url_for('question._list',category_name=category_name))
+    return render_template('question/question_form.html', form=form, category=category)
 
 
 @bp.route('/modify/<int:question_id>', methods=('GET','POST'))
@@ -173,10 +177,13 @@ def modify(question_id):
             return redirect(url_for('question.detail', question_id=question_id))
     else:
         form = QuestionForm(obj=question)
-    return render_template('question/question_form.html',form=form)
+    return render_template('question/question_form.html', form=form)
 
 
-@bp.route('/delete/<int:question_id>',methods=('GET','POST'))
+
+
+
+@bp.route('/delete/<int:question_id>/',methods=('GET','POST'))
 #@login_required
 def delete(question_id):
     question = Question.query.get_or_404(question_id)
@@ -197,13 +204,14 @@ def delete(question_id):
             else:
                 db.session.delete(question)
                 db.session.commit()
-                return redirect(url_for('question._list'))
+                return redirect(url_for('question._list',category_name=question.category_name))
 
         return render_template('question/no_login_password.html', form=form)
 
     db.session.delete(question)
     db.session.commit()
-    return redirect(url_for('question._list'))
+    return redirect(url_for('question._list',category_name=question.category_name))
+
 
 
 

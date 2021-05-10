@@ -1,6 +1,6 @@
 책 <점프 투 플라스크>를 참고하며 진행한 게시판 만들기 개인 프로젝트 입니다.
 
-사용 기술 : Python3, Flask, CSS, javascript, html
+사용 기술 : Python3, Flask, CSS, javascript, jquery, html
 
 프로젝트 기간 : 2021.03.05 ~
 
@@ -31,9 +31,15 @@
 - 회원은 자신이 작성한 질문 글들을 모아볼 수 있습니다.
 - 자신이 작성한 질문글 중에서도 검색, 정렬이 가능합니다.
 
-계속해서 기능을 업데이트할 예정입니다.<br>
+<ver 1.3>
+2021.05.10
 
-이곳에서 프로젝트 진행과정을 보실 수 있습니다. <br>
-https://velog.io/@areum0921/series/Python-Flask<br>
+- 새로운 게시판인 자유 게시판이 생성 되었습니다.
+
+계속해서 기능을 업데이트할 예정입니다.
+
+https://velog.io/@areum0921/series/Python-Flask <br>
 https://velog.io/@areum0921/series/Python-Flask-%EB%82%B4%EB%A7%98%EB%8C%80%EB%A1%9C
+
+이곳에서 프로젝트 진행과정을 보실 수 있습니다.
 
