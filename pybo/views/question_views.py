@@ -177,10 +177,13 @@ def modify(question_id):
             return redirect(url_for('question.detail', question_id=question_id))
     else:
         form = QuestionForm(obj=question)
-    return render_template('question/question_form.html',form=form)
+    return render_template('question/question_form.html', form=form)
 
 
-@bp.route('/delete/<int:question_id>',methods=('GET','POST'))
+
+
+
+@bp.route('/delete/<int:question_id>/',methods=('GET','POST'))
 #@login_required
 def delete(question_id):
     question = Question.query.get_or_404(question_id)
@@ -201,13 +204,14 @@ def delete(question_id):
             else:
                 db.session.delete(question)
                 db.session.commit()
-                return redirect(url_for('question._list'))
+                return redirect(url_for('question._list',category_name=question.category_name))
 
         return render_template('question/no_login_password.html', form=form)
 
     db.session.delete(question)
     db.session.commit()
-    return redirect(url_for('question._list'))
+    return redirect(url_for('question._list',category_name=question.category_name))
+
 
 
 
