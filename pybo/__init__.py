@@ -20,8 +20,11 @@ def page_not_found(e): # 404 오류일때 띄울 화면
 def create_app():
     app = Flask(__name__)  # 플라스크 애플리케이션을 생성하는 코드
 
+
     app.config.from_envvar('APP_CONFIG_FILE')
     # 환경 변수 APP_CONFIG_FILE에 정의된 파일을 환경 파일로 사용
+    app.secret_key= "secret key"
+
 
     # ORM
     db.init_app(app) # 초기화
@@ -50,7 +53,6 @@ def create_app():
     #오류페이지
     app.register_error_handler(404, page_not_found)
     return app
-
 
 
 

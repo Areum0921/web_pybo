@@ -7,16 +7,16 @@
 </div>
 <div class="container mt-3">
     <div class="row">
-        <!--<div class="col-sm-12 col-md-3 col-lg-2 p-2">
+        <div class="col-sm-12 col-md-3 col-lg-2 p-2">
             <nav id="sidebar" class="border-top border-secondary">
                 <div class="list-group">
                     <a class="rounded-0 list-group-item list-group-item-action list-group-item-light active"
-                       href="http://localhost:5000/question/list/free/">자유 게시판</a>
+                       href="http://localhost:5000/question/list/qna">질문 게시판</a>
                     <a class="rounded-0 list-group-item list-group-item-action list-group-item-light active"
-                       href="http://localhost:5000/question/list/qna/">질문 답변 게시판</a>
+                       href="http://localhost:5000/question/list/free">자유 게시판</a>
                 </div>
             </nav>
-        </div>-->
+        </div>
     <div class="col-sm-12 col-md-9 col-lg-10 p-2">
         <div id="content" class="border-secondary">
             <div class="row justify-content-between mb-3">
@@ -28,6 +28,8 @@
                 <option value="popular" {% if so=='popular' %}selected{% endif %}>인기순</option>
             </select>
         </div>
+        <a>내가 작성한 글 목록</a>
+
         <div class="col-4 input-group">
             <input type="text" class="form-control kw" value="{{ kw or ''}}">
             <div class="input-group-append">
@@ -39,7 +41,7 @@
     </div>
         <table class="table">
         <thead>
-        <tr class="thead-dark">
+        <tr class="table-primary">
             <th>번호</th>
             <th>추천수</th>
             <th>제목</th>
@@ -51,8 +53,8 @@
         {% if question_list %}
         {% for question in question_list.items %}
         <tr>
-            <td>{{question_list.total - ((question_list.page-1)*question_list.per_page) - loop.index0}}</td>
-            <td>
+            <td width="8%">{{question_list.total - ((question_list.page-1)*question_list.per_page) - loop.index0}}</td>
+            <td width="10%">
                 {% if question.voter|length > 0 %}
                 <span class="badge badge-warning px-2 py-1">
                     {{question.voter|length}}
@@ -60,7 +62,7 @@
                 {% endif %}
             </td>
 
-            <td>
+            <td width="40%">
                 <a href="{{ url_for('question.detail', question_id=question.id) }}">{{ question.subject }}</a>
                 {% if question.answer_set|length > 0 %}
                 <span class="text-danger small ml-2">{{ [question.answer_set|length] }}</span>
@@ -124,7 +126,7 @@
         </li>
         {% endif %}
     </ul>
-    <a href="{{url_for('question.create')}}" class="btn btn-outline-primary">질문 등록하기</a>
+
 </div>
          </div>
     </div>
