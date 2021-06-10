@@ -13,7 +13,6 @@ naming_convention = {
 }
 db = SQLAlchemy(metadata=MetaData(naming_convention=naming_convention))
 migrate = Migrate()
-UPLOAD_FOLDER = "static/uploads/"
 
 def page_not_found(e): # 404 오류일때 띄울 화면
     return render_template('404.html'), 404
@@ -21,13 +20,8 @@ def page_not_found(e): # 404 오류일때 띄울 화면
 def create_app():
     app = Flask(__name__)  # 플라스크 애플리케이션을 생성하는 코드
 
-
     app.config.from_envvar('APP_CONFIG_FILE')
     # 환경 변수 APP_CONFIG_FILE에 정의된 파일을 환경 파일로 사용
-    app.secret_key= "secret key"
-    app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
-    app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024
-
 
     # ORM
     db.init_app(app) # 초기화
