@@ -205,12 +205,11 @@ def modify(question_id):
             #return render_template('question/question_modify_form.html', form=form)
 
         elif request.method=='GET': # 수정 버튼
-            if g.user.roles==1: # 관리자 계정이면
-                form = QuestionForm2(obj=question)
-
-            else:
+            if not g.user or g.user.roles==0:
                 form = CheckPassword()
                 return render_template('question/no_login_password.html', form=form)
+            elif g.user.roles==1:
+                form = QuestionForm2(obj=question)
 
         return render_template('question/question_modify_form.html', form=form)
 
@@ -238,31 +237,33 @@ def modify(question_id):
 #@login_required
 def delete(question_id):
     question = Question.query.get_or_404(question_id)
-    if g.user.roles==1:
-        db.session.delete(question)
-        db.session.commit()
-        return redirect(url_for('question._list', category_name=question.category_name))
 
     if g.user and question.user:
         if g.user != question.user:
             flash('삭제권한이 없습니다.')
             return redirect(url_for('question.detail', question_id=question_id))
+        elif g.user.roles==1:
+            db.session.delete(question)
+            db.session.commit()
+            return redirect(url_for('question._list', category_name=question.category_name))
 
     if not question.user: # 해당 질문글이 비회원 상태에서 써졌을경우
-        form = CheckPassword()
-        if(request.method == 'POST' and form.validate_on_submit()):
-            password = form.password_check.data # form으로 비밀번호 입력 받기
+        if not g.user or g.user.roles==0:
+            form = CheckPassword()
+            if(request.method == 'POST' and form.validate_on_submit()):
+                password = form.password_check.data # form으로 비밀번호 입력 받기
 
-            if(password != question.password):
-                flash('해당 질문글의 비밀번호와 다릅니다.')
-                return render_template('question/no_login_password.html', form=form)
-                #return redirect(url_for('question.detail', question_id=question_id))
-            else:
-                db.session.delete(question)
-                db.session.commit()
-                return redirect(url_for('question._list',category_name=question.category_name))
+                if(password != question.password):
+                    flash('해당 질문글의 비밀번호와 다릅니다.')
+                    return render_template('question/no_login_password.html', form=form)
+                    #return redirect(url_for('question.detail', question_id=question_id))
+                else:
+                    db.session.delete(question)
+                    db.session.commit()
+                    return redirect(url_for('question._list',category_name=question.category_name))
 
-        return render_template('question/no_login_password.html', form=form)
+            return render_template('question/no_login_password.html', form=form)
+
 
     db.session.delete(question)
     db.session.commit()
