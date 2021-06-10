@@ -48,6 +48,7 @@ class User(db.Model):
     username = db.Column(db.String(150), unique=True, nullable=False)
     password = db.Column(db.String(200), nullable=False)
     email = db.Column(db.String(120), unique=True, nullable=False)
+    roles = db.Column(db.Integer,nullable=True) # 권한 부여
 
 class Comment(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -61,6 +62,9 @@ class Comment(db.Model):
     question = db.relationship('Question', backref=db.backref('comment_set'))
     answer_id = db.Column(db.Integer, db.ForeignKey('answer.id', ondelete='CASCADE'), nullable=True)
     answer = db.relationship('Answer', backref=db.backref('comment_set'))
+
+
+
 
 
 

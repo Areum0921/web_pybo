@@ -162,9 +162,58 @@ def create(category_name):
 
 
 @bp.route('/modify/<int:question_id>', methods=('GET','POST'))
-@login_required
+#@login_required
 def modify(question_id):
     question = Question.query.get_or_404(question_id)
+
+    if question.user: # 회원 작성글
+        if g.user != question.user and g.user.roles!=1:
+            flash('수정권한이 없습니다.')
+            return redirect(url_for('question.detail', question_id=question_id))
+        if request.method == 'POST': # 내용 쓴 후 저장하기 버튼
+            form = QuestionForm()
+            if form.validate_on_submit():
+                form.populate_obj(question)
+                question.modify_date = datetime.now()
+                db.session.commit()
+                return redirect(url_for('question.detail', question_id=question_id))
+        else:
+            form = QuestionForm(obj=question)
+
+        return render_template('question/question_form.html', form=form)
+
+    elif not question.user: # 비회원 작성글
+        form = QuestionForm2(obj=question)
+
+        if request.method == 'POST' and 'submit' in request.form: # 수정 후 저장하기 버튼 누를때
+            form = QuestionForm2()
+            if form.validate_on_submit():
+                form.populate_obj(question)
+                question.modify_date = datetime.now()
+                db.session.commit()
+                return redirect(url_for('question.detail', question_id=question_id))
+
+        elif request.method == 'POST' and 'modify' in request.form : # 비밀번호 확인 버튼
+            form = CheckPassword()
+            password = form.password_check.data
+            if password == question.password:
+                form = QuestionForm2(obj=question)
+            elif password != question.password:
+                flash('비밀번호 틀림')
+                return render_template('question/no_login_password.html', form=form)
+            #return render_template('question/question_modify_form.html', form=form)
+
+        elif request.method=='GET': # 수정 버튼
+            if g.user.roles==1: # 관리자 계정이면
+                form = QuestionForm2(obj=question)
+
+            else:
+                form = CheckPassword()
+                return render_template('question/no_login_password.html', form=form)
+
+        return render_template('question/question_modify_form.html', form=form)
+
+"""
     if g.user != question.user:
         flash('수정권한이 없습니다.')
         return redirect(url_for('question.detail', question_id=question_id))
@@ -175,9 +224,10 @@ def modify(question_id):
             question.modify_date = datetime.now()
             db.session.commit()
             return redirect(url_for('question.detail', question_id=question_id))
-    else:
-        form = QuestionForm(obj=question)
-    return render_template('question/question_form.html', form=form)
+        else:
+            form = QuestionForm(obj=question)
+"""
+
 
 
 
