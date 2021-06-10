@@ -47,7 +47,7 @@
                     </div>
                     </div>
                     {% if g.user %}
-                    {% if g.user == question.user %}
+                    {% if g.user == question.user or g.user.roles==1 %}
                     <div class="my-3">
                         <a href="{{ url_for('question.modify', question_id=question.id) }}"
                             class="btn btn-sm btn-outline-secondary">수정</a>
@@ -56,11 +56,14 @@
                     </div>
                     {% endif %}
                     {% endif %}
+
+                    {% if g.user.roles!=1 %}
                     {% if not question.user %}
                     <a href="{{ url_for('question.modify', question_id=question.id) }}"
                             class="btn btn-sm btn-outline-secondary">수정</a>
                         <a href="#" class="delete btn btn-sm btn-outline-secondary"
                             data-uri="{{ url_for('question.delete', question_id=question.id) }}">삭제</a>
+                    {% endif %}
                     {% endif %}
 
 

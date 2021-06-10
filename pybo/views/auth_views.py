@@ -18,7 +18,9 @@ def signup():
         email = User.query.filter_by(email=form.email.data).first()
         if not user and not email:
             user = User(username=form.username.data, password=generate_password_hash(form.password1.data),
-                        email=form.email.data)
+                        email=form.email.data, roles=0)
+            # roles==1 // admin
+            # roles==0 // normal
             db.session.add(user)
             db.session.commit()
             return redirect(url_for('main.index'))
@@ -70,7 +72,6 @@ def login_required(view):
             return redirect(url_for('auth.login'))
         return view(**kwargs)
     return wrapped_view
-
 
 
 
