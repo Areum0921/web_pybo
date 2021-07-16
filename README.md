@@ -1,6 +1,12 @@
-책 <점프 투 플라스크>를 참고하며 진행한 게시판 만들기 개인 프로젝트 입니다.
+책 <점프 투 플라스크>를 참고하며 만든 <CRUD 게시판> 개인 프로젝트 입니다.
 
-사용 기술 : Python3, Flask, CSS, javascript, jquery, html
+<사용 기술><br>
+Backend : Python3 <br>
+Front : html, CSS, javascript<br>
+Web Framework : Flask<br>
+Hosting : AWS Rightsail<br>
+DB  : SQLite3 (sqlalchemy)<br>
+Server  : Nginx, Gunicorn<br>
 
 프로젝트 기간 : 2021.03.05 ~
 
